@@ -49,6 +49,11 @@ let chartInstance   = null;
 let isFetching      = false;   // çift istek önleyici
 let lastSuccessTime = null;
 
+// ── SHEET CACHE (aynı veri tekrar çekilmez) ───────────────────
+// Her sheet için son satır sayısı ve verisi saklanır.
+// Satır sayısı değişmemişse cached veri döner → gereksiz istek yok.
+const sheetCache = {};   // { sheetName: { rowCount, data } }
+
 // ── INIT ──────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
   if (typeof LOGO_ANADOLU   !== 'undefined') document.getElementById('imgAnadolu').src   = LOGO_ANADOLU;
