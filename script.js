@@ -32,8 +32,8 @@ const MAX_SCORE   = Object.values(TASK_POINTS).reduce((a,b)=>a+b, 0); // 500
 // ── GECİKME AYARLARI ─────────────────────────────────────────
 // Hızlı mod: ilk 30 sn her 3sn, sonra her 6sn günceller
 
-const REFRESH_FAST_MS = 3000;   // ilk periyot
-const REFRESH_SLOW_MS = 6000;   // normal periyot
+const REFRESH_FAST_MS = 4000;   // ilk periyot
+const REFRESH_SLOW_MS = 8000;   // normal periyot
 const FAST_DURATION   = 30000;  // 30 sn hızlı mod
 
 const TEAM_EMOJIS = ["🤖","🦊","🐉","🦅","🐺","🦁","🐯","🐻","🦝","🐸","🦜","🐙"];
@@ -88,23 +88,44 @@ function startTimer() {
 
 // ── ADAPTİF YENİLEME (gecikmeyi minimize eder) ────────────────
 function runWithAdaptiveRefresh() {
-  tick(); // ilk anlık çağrı
-  // İlk 30 sn hızlı
-  const fastInterval = setInterval(tick, REFRESH_FAST_MS);
-  setTimeout(() => {
-    clearInterval(fastInterval);
-    setInterval(tick, REFRESH_SLOW_MS);
-  }, FAST_DURATION);
+  tick(); // ilk çağrı
+
+  let interval = REFRESH_FAST_MS;
+  const startTime = Date.now();
+
+  async function loop() {
+    await tick(); // bitmeden yenisi başlamaz
+
+    if (Date.now() - startTime > FAST_DURATION) {
+      interval = REFRESH_SLOW_MS;
+    }
+
+    setTimeout(loop, interval);
+  }
+
+  setTimeout(loop, interval);
 }
 
 // ── SHEETS OKUMA (paralel + cache bypass) ─────────────────────
 async function fetchSheet(name) {
-
-  
   const url = `https://opensheet.elk.sh/${SHEET_ID}/${encodeURIComponent(name)}`;
+
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`Sheet okunamadı: ${name}`);
-  return res.json();
+
+  const data = await res.json();
+
+  // Cache kontrolü
+  if (sheetCache[name] && sheetCache[name].rowCount === data.length) {
+    return sheetCache[name].data;
+  }
+
+  sheetCache[name] = {
+    rowCount: data.length,
+    data: data
+  };
+
+  return data;
 }
 
 // ── TÜM SHEET'LERİ PARALEL ÇEK ───────────────────────────────
@@ -380,6 +401,14 @@ async function tick() {
 
   try {
     const { results, winner } = await computeScores();
+
+const currentHash = JSON.stringify(results);
+if (window.lastHash === currentHash) {
+  setStatus('ok');
+  return;
+}
+window.lastHash = currentHash;
+
     renderLeaderboard(results, winner);
     renderTaskList(results);
     updateChart(results);
