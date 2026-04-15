@@ -325,9 +325,6 @@ function setStatus(state) {
 
 function updateLastUpdateTime() {
   const el = document.getElementById('lastUpdate');
-  if (!el) return;
-  function updateLastUpdateTime() {
-  const el = document.getElementById('lastUpdate');
   if (!el || !lastSuccessTime) return;
 
   const diff = Math.floor((Date.now() - lastSuccessTime) / 1000);
@@ -409,37 +406,34 @@ function renderLeaderboard(results, winner) {
 
 // ── ANA DÖNGÜ ─────────────────────────────────────────────────
 async function tick() {
-  if (isFetching) return;   // önceki istek bitmeden yenisini başlatma
+  if (isFetching) return;
   isFetching = true;
   setStatus('loading');
 
   try {
     const { results, winner } = await computeScores();
 
-const currentHash = JSON.stringify(results);
-if (window.lastHash === currentHash) {
-  setStatus('ok');
-  return;
-}
-window.lastHash = currentHash;
+    const currentHash = JSON.stringify(results);
+    if (window.lastHash === currentHash) {
+      setStatus('ok');
+      return;
+    }
+    window.lastHash = currentHash;
 
     renderLeaderboard(results, winner);
     renderTaskList(results);
     updateChart(results);
     updateLastUpdateTime();
+
     setStatus('ok');
     lastSuccessTime = Date.now();
-    const now = Date.now();
 
-// 15 sn veri gelmezse bağlantı problemi say
-if (lastSuccessTime && now - lastSuccessTime > 15000) {
-  setStatus('error');
-}
   } catch(e) {
     setStatus('error');
-    const t=document.getElementById('tickerText');
-    if (t) t.textContent='⚠️ Veri okunamadı – Sheets paylaşımını kontrol et.';
+    const t = document.getElementById('tickerText');
+    if (t) t.textContent = '⚠️ Veri okunamadı';
     console.error('tick error:', e);
+
   } finally {
     isFetching = false;
   }
