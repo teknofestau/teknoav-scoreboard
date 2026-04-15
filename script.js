@@ -365,6 +365,8 @@ function renderLeaderboard(results, winner) {
 
   el.innerHTML='';
   results.forEach((r,i)=>{
+    const prev = previousScores[r.team];
+    const scoreIncreased = prev !== undefined && r.score > prev;
     const missions=[1,2,3,4,5].map(g=>`<span class="m ${r.done.includes(g)?'done':''}">${'G'+g}</span>`).join('');
     const isWinner = winner&&winner.team===r.team;
     const allDone  = r.done.length===5;
