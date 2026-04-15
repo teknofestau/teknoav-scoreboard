@@ -48,6 +48,7 @@ let tickerIdx       = 0;
 let chartInstance   = null;
 let isFetching      = false;   // çift istek önleyici
 let lastSuccessTime = null;
+let fetchToggle = true;
 
 // ── SHEET CACHE (aynı veri tekrar çekilmez) ───────────────────
 // Her sheet için son satır sayısı ve verisi saklanır.
@@ -132,10 +133,21 @@ async function fetchSheet(name) {
 // Eskiden sırayla: ~6×800ms = ~4800ms gecikme
 // Şimdi paralel:  ~800ms (sadece en yavaş istek kadar)
 async function fetchAllSheets() {
-  const [teamRows, ...taskRows] = await Promise.all([
-    fetchSheet(TEAM_SHEET),
-    ...TASK_SHEETS.map(t => fetchSheet(t.name))
-  ]);
+  const teamRows = await fetchSheet(TEAM_SHEET);
+
+  let taskRows;
+
+  if (fetchToggle) {
+    taskRows = await Promise.all(
+      TASK_SHEETS.map(t => fetchSheet(t.name))
+    );
+  } else {
+    // önceki cache'i kullan
+    taskRows = TASK_SHEETS.map(t => sheetCache[t.name]?.data || []);
+  }
+
+  fetchToggle = !fetchToggle;
+
   return { teamRows, taskRows };
 }
 
@@ -314,11 +326,12 @@ function setStatus(state) {
 function updateLastUpdateTime() {
   const el = document.getElementById('lastUpdate');
   if (!el) return;
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2,'0');
-  const m = String(now.getMinutes()).padStart(2,'0');
-  const s = String(now.getSeconds()).padStart(2,'0');
-  el.textContent = `Son: ${h}:${m}:${s}`;
+  function updateLastUpdateTime() {
+  const el = document.getElementById('lastUpdate');
+  if (!el || !lastSuccessTime) return;
+
+  const diff = Math.floor((Date.now() - lastSuccessTime) / 1000);
+  el.textContent = `Son güncelleme: ${diff} sn önce`;
 }
 
 // ── WINNER ────────────────────────────────────────────────────
@@ -343,6 +356,7 @@ function renderLeaderboard(results, winner) {
   // Puan değişimlerini yakala → ticker
   for (const r of results) {
     const prev = previousScores[r.team];
+    const scoreIncreased = prev !== undefined && r.score > prev;
     if (prev!==undefined && r.score>prev) {
       const gained  = r.score-prev;
       const taskId  = Object.entries(TASK_POINTS).find(([,p])=>p===gained)?.[0];
@@ -361,7 +375,7 @@ function renderLeaderboard(results, winner) {
     const sTxt  = isWinner?'👑 KAZANAN':allDone?'✅ BİTİRDİ':'⚡ Devam Ediyor';
     const pct   = Math.round((r.score/MAX_SCORE)*100);
     const div = document.createElement('div');
-    div.className='row';
+    div.className = 'row' + (scoreIncreased ? ' score-up' : '');
     div.innerHTML=`
       <div class="rank ${rankCls(i)}">${i+1}</div>
       <div class="team">
@@ -415,6 +429,12 @@ window.lastHash = currentHash;
     updateLastUpdateTime();
     setStatus('ok');
     lastSuccessTime = Date.now();
+    const now = Date.now();
+
+// 15 sn veri gelmezse bağlantı problemi say
+if (lastSuccessTime && now - lastSuccessTime > 15000) {
+  setStatus('error');
+}
   } catch(e) {
     setStatus('error');
     const t=document.getElementById('tickerText');
