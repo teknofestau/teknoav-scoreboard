@@ -368,3 +368,11 @@ body {
   .status { font-size:9px; padding:5px 8px; }
   .team-name { font-size:11px; }
 }
+.score-up {
+  animation: glow 0.8s ease;
+}
+
+@keyframes glow {
+  0%   { background: rgba(0,255,150,0.25); }
+  100% { background: transparent; }
+}
