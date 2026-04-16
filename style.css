@@ -65,7 +65,7 @@ body {
 
 .logo {
   background: transparent;
-  mix-blend-mode: lighten;
+  filter: brightness(0) invert(1);
 }
 
 /* SOL: iki logo yan yana */
