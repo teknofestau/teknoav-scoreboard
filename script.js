@@ -44,14 +44,12 @@ const TEAM_EMOJI_MAP = {
   "CEZERİ": "🤖",
   "HÜRKUŞ": "🦅",
   "KALKAN": "🛡️",
-  "ANKA": "🔥"
+  "ANKA": "🐦‍🔥"
 };
 
 // ── STATE ─────────────────────────────────────────────────────
 let winnerShown     = false;
 let previousScores  = {};
-let teamEmojiMap    = {};
-let emojiCounter    = 0;
 let tickerQueue     = [];
 let tickerIdx       = 0;
 let chartInstance   = null;
@@ -176,9 +174,9 @@ function parseTs(ts) {
 function emojiFor(team) {
   if (!team) return "❓";
 
-  // emojileri temizle (unicode aralığı)
+  // TÜM emoji + sembolleri temizle
   const cleaned = team
-    .replace(/[\u{1F300}-\u{1FAFF}]/gu, "") // emoji sil
+    .replace(/[^\p{L}\p{N}\s]/gu, "") // sadece harf + sayı bırak
     .trim();
 
   const normalized = cleaned
