@@ -37,12 +37,12 @@ const REFRESH_SLOW_MS = 8000;   // normal periyot
 const FAST_DURATION   = 30000;  // 30 sn hızlı mod
 
 const TEAM_EMOJI_MAP = {
-  "AKINCI": "⚡",
-  "KIZILELMA": "🎯",
+  "AKINCI": "⚔️",
+  "KIZILELMA": "🍎",
   "KEMANKEŞ": "🏹",
-  "KAAN": "🛩️",
+  "KAAN": "✈️",
   "CEZERİ": "🤖",
-  "HÜRKUŞ": "🦅",
+  "HÜRKUŞ": "🕊️",
   "KALKAN": "🛡️",
   "ANKA": "🐦‍🔥"
 };
