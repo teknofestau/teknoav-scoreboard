@@ -63,6 +63,11 @@ body {
   opacity:.65;
 }
 
+.logo {
+  background: transparent;
+  mix-blend-mode: lighten;
+}
+
 /* SOL: iki logo yan yana */
 .logo-left {
   display: flex;
