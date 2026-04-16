@@ -36,7 +36,16 @@ const REFRESH_FAST_MS = 4000;   // ilk periyot
 const REFRESH_SLOW_MS = 8000;   // normal periyot
 const FAST_DURATION   = 30000;  // 30 sn hızlı mod
 
-const TEAM_EMOJIS = ["🤖","🦊","🐉","🦅","🐺","🦁","🐯","🐻","🦝","🐸","🦜","🐙"];
+const TEAM_EMOJI_MAP = {
+  "AKINCI": "⚡",
+  "KIZILELMA": "🎯",
+  "KEMANKEŞ": "🏹",
+  "KAAN": "🛩️",
+  "CEZERİ": "🤖",
+  "HÜRKUŞ": "🦅",
+  "KALKAN": "🛡️",
+  "ANKA": "🔥"
+};
 
 // ── STATE ─────────────────────────────────────────────────────
 let winnerShown     = false;
@@ -165,8 +174,23 @@ function parseTs(ts) {
 }
 
 function emojiFor(team) {
-  if (!teamEmojiMap[team]) { teamEmojiMap[team] = TEAM_EMOJIS[emojiCounter%TEAM_EMOJIS.length]; emojiCounter++; }
-  return teamEmojiMap[team];
+  if (!team) return "❓";
+
+  // emojileri temizle (unicode aralığı)
+  const cleaned = team
+    .replace(/[\u{1F300}-\u{1FAFF}]/gu, "") // emoji sil
+    .trim();
+
+  const normalized = cleaned
+    .toUpperCase()
+    .replace(/İ/g, "I")
+    .replace(/Ü/g, "U")
+    .replace(/Ş/g, "S")
+    .replace(/Ğ/g, "G")
+    .replace(/Ö/g, "O")
+    .replace(/Ç/g, "C");
+
+  return TEAM_EMOJI_MAP[normalized] || "❓";
 }
 
 // ── SKOR HESAPLAMA ────────────────────────────────────────────
