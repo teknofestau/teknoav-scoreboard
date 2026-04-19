@@ -48,7 +48,7 @@ const TEAM_EMOJI_MAP = {
 };
 
 // ── STATE ─────────────────────────────────────────────────────
-let winnerShown     = false;
+let winnerShown     = null;   // kazanan takımın adını saklar (false yerine)
 let previousScores  = {};
 let tickerQueue     = [];
 let tickerIdx       = 0;
@@ -234,9 +234,15 @@ async function computeScores() {
 
   const finishers = results.filter(r=>r.score>=MAX_SCORE);
   let winner = null;
-  const withTime = finishers.filter(f=>f.finishTime instanceof Date).sort((a,b)=>a.finishTime-b.finishTime);
-  if (withTime.length)       winner = withTime[0];
-  else if (finishers.length) winner = finishers.sort((a,b)=>b.score-a.score||a.team.localeCompare(b.team))[0];
+  if (finishers.length) {
+  winner = finishers.slice().sort((a,b)=>{
+    if (b.score !== a.score) return b.score - a.score;
+    const at = a.finishTime instanceof Date ? a.finishTime.getTime() : Infinity;
+    const bt = b.finishTime instanceof Date ? b.finishTime.getTime() : Infinity;
+    if (at !== bt) return at - bt;
+    return a.team.localeCompare(b.team);
+  })[0];
+}
 
   results.sort((a,b)=>{
     if (b.score!==a.score) return b.score-a.score;
@@ -416,8 +422,8 @@ function renderLeaderboard(results, winner) {
   const tickerEl=document.getElementById('tickerText');
   if (tickerEl&&tickerQueue.length>0) tickerEl.textContent=tickerQueue[tickerQueue.length-1];
 
-  if (winner&&!winnerShown) {
-    winnerShown=true;
+  if (winner && winnerShown !== winner.team) {
+  winnerShown = winner.team;
     let shortTime='';
     if (winner.finishTime instanceof Date) {
       const sec=Math.floor((winner.finishTime-START_TIME)/1000);
