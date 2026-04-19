@@ -12,7 +12,7 @@ const START_TIME = new Date("2026-04-22T14:00:00");
 // ════════════════════════════════════════════════════════════════
 
 // ── AYARLAR ──────────────────────────────────────────────────
-const SHEET_ID   = "1H0CHwZDOZ-TgvjJzrwSiDzgYTpn7J7kZZCNUbHFTag8";
+const SHEET_ID   = "1h1TCRZwoOht63JirK7lFsIfwK1Yy2ACplPh1mYF9DUk";
 const TEAM_SHEET = "Form Yanıtları 0";
 const TASK_SHEETS = [
   { task:1, name:"Form Yanıtları 1" },
