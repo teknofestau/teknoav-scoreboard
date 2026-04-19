@@ -398,8 +398,9 @@ function renderLeaderboard(results, winner) {
     const missions=[1,2,3,4,5].map(g=>`<span class="m ${r.done.includes(g)?'done':''}">${'G'+g}</span>`).join('');
     const isWinner = winner&&winner.team===r.team;
     const allDone  = r.done.length===5;
-    const sCls  = isWinner?'leader':allDone?'done-st':'';
-    const sTxt  = isWinner?'👑 KAZANAN':allDone?'✅ BİTİRDİ':'⚡ Devam Ediyor';
+    const notStarted = r.score === 0 && r.done.length === 0;
+    const sCls  = isWinner?'leader':allDone?'done-st':notStarted?'not-started':'';
+    const sTxt  = isWinner?'👑 KAZANAN':allDone?'✅ BİTİRDİ':notStarted?'🚀 Göreve Başladı':'⚡ Devam Ediyor';
     const pct   = Math.round((r.score/MAX_SCORE)*100);
     const div = document.createElement('div');
     div.className = 'row' + (scoreIncreased ? ' score-up' : '');
