@@ -3,8 +3,8 @@
 //
 //  ╔══════════════════════════════════════════════════════════╗
 //  ║  📅 YARIŞMA BAŞLANGIÇ ZAMANI — SADECE BU SATIRI DEĞİŞTİR ║
-//  ║  Format: new Date("YYYY-MM-DDTHH:MM:SS")                  ║
-const START_TIME = new Date("2026-04-22T11:00:00");
+//  ║  Format: new Date("YYYY-MM-DDTHH:MM:SS")                 ║
+const START_TIME = new Date("2026-04-22T11:00:00"); 
 //  ╚══════════════════════════════════════════════════════════╝
 //
 //  🖼️ LOGOLARI DEĞİŞTİRMEK İÇİN: logos.js dosyasını güncelle
